@@ -124,6 +124,16 @@ window.SubscriptionsSmartQuery = (function () {
     return countSelectedCandidates(items) >= getSelectionLimit(kind);
   };
 
+  const buildSelectionTitle = (kind, suffix) => {
+    const realKind = normalizeCandidateKind(kind);
+    const currentItems =
+      modalState && Array.isArray(realKind === 'intent' ? modalState.intent_queries : modalState.keywords)
+        ? (realKind === 'intent' ? modalState.intent_queries : modalState.keywords)
+        : [];
+    const selectedCount = countSelectedCandidates(currentItems);
+    return `${getKindLabel(realKind)}（${selectedCount}/${getSelectionLimit(realKind)}，${suffix}）`;
+  };
+
   const sanitizeNoYear = (value) => {
     const base = normalizeText(value);
     if (!base) return '';
@@ -1535,12 +1545,12 @@ window.SubscriptionsSmartQuery = (function () {
     const hasIntentQueries = (modalState.intent_queries || []).length > 0;
     const keywordBlock =
       `<div class="dpr-combo-block">
-        <div class="dpr-modal-group-title">关键词（必选，最多 6 条，用于召回）</div>
+        <div class="dpr-modal-group-title">${buildSelectionTitle('keyword', '用于召回')}</div>
         <div class="dpr-pick-grid">${kwHtml || '<div style="color:#999;">无关键词候选</div>'}</div>
       </div>`;
     const intentBlock =
       `<div class="dpr-combo-block">
-        <div class="dpr-modal-group-title">意图Query（必选，最多 4 条，用于意图召回与最终打分）</div>
+        <div class="dpr-modal-group-title">${buildSelectionTitle('intent', '用于意图召回与最终打分')}</div>
         <div class="dpr-pick-grid">${intentHtml || '<div style="color:#999;">无意图查询候选</div>'}</div>
       </div>`;
     const divider = `<div class="dpr-modal-divider"></div>`;
@@ -1664,7 +1674,7 @@ window.SubscriptionsSmartQuery = (function () {
       : '';
     const kwSection = hasKeywordSection
       ? `<div class="dpr-chat-result-block">
-           <div class="dpr-modal-group-title">关键词（必选，最多 6 条，用于召回）</div>
+           <div class="dpr-modal-group-title">${buildSelectionTitle('keyword', '用于召回')}</div>
            <div class="dpr-chat-slot-area ${hasKeywords ? 'has-candidates' : 'draft-only'}">
              <div class="dpr-chat-slot-scroll">
                <div class="dpr-cloud-grid dpr-cloud-grid-keywords">${kwHtml}</div>
@@ -1674,7 +1684,7 @@ window.SubscriptionsSmartQuery = (function () {
       : '';
     const intentSection = hasIntentSection
       ? `<div class="dpr-chat-result-block">
-           <div class="dpr-modal-group-title">意图Query（必选，最多 4 条，用于意图召回与最终打分）</div>
+           <div class="dpr-modal-group-title">${buildSelectionTitle('intent', '用于意图召回与最终打分')}</div>
            <div class="dpr-chat-slot-area ${hasIntentQueries ? 'has-candidates' : 'draft-only'}">
              <div class="dpr-chat-slot-scroll">
                <div class="dpr-cloud-grid dpr-cloud-grid-intent">${intentHtml}</div>
